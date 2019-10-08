@@ -1,0 +1,33 @@
+using JuMP, CSV, Clp, GLPK, DataFrames, LinearAlgebra
+
+child = Model(with_optimizer(Clp.Optimizer))
+
+costo=[ 600 700 400 0;
+        320 300 350 0;
+        500 480 450 0]
+demanda=[30 35 30 5]
+oferta=[25;
+        40; 
+        30]
+
+@variable(child,x[1:3,1:4]>=0 )  
+@objective(child,Min,sum(x.*costo))
+for i=1:3
+    @constraint(child,sum(x[i,j] for j=1:4)<=oferta[i])
+end
+for j=1:4
+@constraint(child,sum(x[i,j] for i=1:3)<=demanda[j])
+end 
+print(child)
+JuMP.optimize!(child)
+obj_value=JuMP.objective_value(child)
+
+println("Valor func objetivo, El costo minimo es :", obj_value)
+
+
+println("las asignaciones son")
+for i in 1:3
+    for j=1:4
+        println( "x[",i,",",j, "] = $(JuMP.value(x[i,j] ))")  
+    end
+end

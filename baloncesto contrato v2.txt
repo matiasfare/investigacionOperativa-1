@@ -1,0 +1,71 @@
+import Pkg
+tempdir = mktempdir()
+Pkg.activate(tempdir)
+Pkg.add(["JuMP", "CSV","Clp","GLPK","DataFrames","LinearAlgebra"])
+
+using JuMP, CSV, Clp, GLPK, DataFrames, LinearAlgebra
+
+m = Model(with_optimizer(Clp.Optimizer))
+#Variables: xj= jugadores
+@variables(m, begin #Definimos las variables
+        x1>=0
+        x2>=0
+	x3>=0
+        x4>=0
+	x5>=0            
+end)  
+# sa
+@constraint(m, 50000*x1+25200*x2+36000*x3+47000*x4+12000*x5<=50000)        
+@constraint(m, x1<=1)           
+@constraint(m, x2<=1)
+@constraint(m, x3<=1)
+@constraint(m, x4<=1)
+@constraint(m, x5<=1)
+
+@objective(m, Max, 15*x1+8*x2+15*x3+17*x4+7*x5)
+print(m)
+JuMP.optimize!(m)
+
+obj_value=JuMP.objective_value(m)
+x1=JuMP.value(x1)
+x2=JuMP.value(x2)
+x3=JuMP.value(x3)
+x4=JuMP.value(x4)
+x5=JuMP.value(x5)
+
+println("Valor func objetivo_max=", obj_value)
+println("x1 =", x1)
+println("x2 =", x2)
+println("x3 =", x3)
+println("x4 =", x4)
+println("x5 =", x5)
+
+resultado
+
+Max 15 x1 + 8 x2 + 15 x3 + 17 x4 + 7 x5
+Subject to
+ x1 >= 0.0
+ x2 >= 0.0
+ x3 >= 0.0
+ x4 >= 0.0
+ x5 >= 0.0
+ 50000 x1 + 25200 x2 + 36000 x3 + 47000 x4 + 12000 x5 <= 50000.0
+ x1 <= 1.0
+ x2 <= 1.0
+ x3 <= 1.0
+ x4 <= 1.0
+ x5 <= 1.0
+Valor func objetivo_max=22.723404255319146
+x1 =0.0
+x2 =0.0
+x3 =1.0
+x4 =0.04255319148936162
+x5 =1.0
+Coin0506I Presolve 1 (-5) rows, 5 (0) columns and 5 (-5) elements
+Clp0006I 0  Obj -0 Primal inf 0.999999 (1) Dual inf 98.958117 (5)
+Clp0006I 1  Obj 22.723404
+Clp0000I Optimal - objective value 22.723404
+Coin0511I After Postsolve, objective 22.723404, infeasibilities - dual 0 (0), primal 0 (0)
+Clp0032I Optimal objective 22.72340426 - 1 iterations time 0.002, Presolve 0.00
+
+Esto es, contrataremos a los jugadores correspondientes a las variables 3 y 5: Chriss Burgess (del Ulsan Phoebus) y K.C. Walekowski (del Farho Vigo). Y haciendo esto obtendremos una aportación (utilidad para el equipo)de los jugadores al equipo de 22. 

@@ -1,0 +1,72 @@
+import Pkg
+Pkg.add("JuMP")
+Pkg.add("CSV")
+Pkg.add("Clp")
+Pkg.add("GLPK")
+Pkg.add("DataFrames")
+Pkg.add("LinearAlgebra")
+
+using JuMP, CSV, Clp, GLPK, DataFrames, LinearAlgebra
+
+m = Model(with_optimizer(Clp.Optimizer))
+#Variables: xij= cantidad de carros para bebés producidas por las plantas i= 1, 2, 3 que serán distribuidos mensualmente 
+# a los centros de distribucióna j= 1, 2, 3, 4
+@variables(m, begin #Definimos las variables
+        x11>=0 
+        x12>=0             
+        x13>=0            
+        x14>=0 
+        x21>=0             
+        x22>=0             
+        x23>=0            
+        x24>=0 
+        x31>=0             
+        x32>=0             
+        x33>=0            
+        x34>=0 
+         
+end)  
+# restricciones de Oferta
+@constraint(m, x11+x12+x13+x14==12)        
+@constraint(m, x21+x22+x23+x24==17)           
+@constraint(m, x31+x32+x33+x34==11) 
+ 
+# restricciones de Demanda
+@constraint(m, x11+x21+x31== 10)
+@constraint(m, x12+x22+x32== 10)
+@constraint(m, x13+x23+x33== 10)
+@constraint(m, x14+x24+x34== 10)
+
+@objective(m, Min, 500*x11+750*x12+300*x13+700*x14+650*x21+800*x22+400*x23+600*x24+400*x31+700*x32+500*x33+550*x34)
+print(m)
+JuMP.optimize!(m)
+
+obj_value=JuMP.objective_value(m)
+x11=JuMP.value(x11)
+x12=JuMP.value(x12)
+x13=JuMP.value(x13)
+x14=JuMP.value(x14)
+x21=JuMP.value(x21)
+x22=JuMP.value(x22)
+x23=JuMP.value(x23)
+x24=JuMP.value(x24)
+x31=JuMP.value(x31)
+x32=JuMP.value(x32)
+x33=JuMP.value(x33)
+x34=JuMP.value(x34)
+
+println("Valor func objetivo_min=", obj_value)
+println("x11 =", x11)
+println("x12    =", x12)
+println("x13    =", x13)
+println("x14    =", x14)
+
+println("x21 =", x21)
+println("x22    =", x22)
+println("x23    =", x23)
+println("x24    =", x24)
+
+println("x31 =", x31)
+println("x32    =", x32)
+println("x33    =", x33)
+println("x34    =", x34)
