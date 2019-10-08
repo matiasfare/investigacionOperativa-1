@@ -1,0 +1,37 @@
+using JuMP, CSV, Clp, GLPK, DataFrames, LinearAlgebra
+
+m = Model(with_optimizer(Clp.Optimizer))
+#Variables: xij= cantidad de muebles del tipo i=1, 2, 3, 4
+@variables(m, begin #Definimos las variables
+        x1>=0 
+        x2>=0             
+        x3>=0            
+        x4>=0  
+         
+end)  
+# restricciones de Oferta
+@constraint(m, 5*x1+1*x2+9*x3+12*x4<=1500)        
+@constraint(m, 2*x1+3*x2+4*x3+1*x4<=1000)           
+@constraint(m, 3*x1+2*x2+5*x3+10*x4<=800) 
+ 
+# restricciones de Demanda
+@constraint(m, x1>=40)
+@constraint(m, x2>=130)
+@constraint(m, x3>=30)
+@constraint(m, x4>=10)
+
+@objective(m, Max, 12*x1+5*x2+15*x3+10*x4)
+print(m)
+JuMP.optimize!(m)
+
+obj_value=JuMP.objective_value(m)
+x1=JuMP.value(x1)
+x2=JuMP.value(x2)
+x3=JuMP.value(x3)
+x4=JuMP.value(x4)
+
+println("Valor func objetivo_max=", obj_value)
+println("x1 =", x1)
+println("x2    =", x2)
+println("x3    =", x3)
+println("x4    =", x4)
